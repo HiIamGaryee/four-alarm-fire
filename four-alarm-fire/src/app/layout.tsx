@@ -17,7 +17,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Four Fire Alarm",
+  title: "MyGage",
   description: "Freedom Of Your Loan",
 };
 
