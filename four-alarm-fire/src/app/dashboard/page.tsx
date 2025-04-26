@@ -120,7 +120,7 @@ export default function Dashboard() {
       </div>
       {/* Top Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="flex justify-center items-center">
+        <Card className="flex justify-center items-center bg-[#f5e8af]">
           <CardContent className="flex items-center pb-0">
             <ChartContainer
               config={chartConfig}
@@ -188,24 +188,27 @@ export default function Dashboard() {
             {[
               {
                 title: "Income Data",
+                bg: "#fadbc8",
                 value: data.incomeMonthly
                   ? `RM ${data.incomeMonthly.toFixed(2)}`
                   : "-",
               },
               {
                 title: "Debt-to-Income",
+                bg: "#d9e3e8",
                 value: data.debtsMonthly
                   ? `RM ${data.debtsMonthly.toFixed(2)}`
                   : "-",
               },
               {
                 title: "Utilization Rate",
+                bg: "#c3b0bc",
                 value: data.utilization
                   ? `${(data.utilization * 100).toFixed(1)}%`
                   : "-",
               },
             ].map((item) => (
-              <Card key={item.title}>
+              <Card key={item.title} style={{ backgroundColor: item.bg }}>
                 <CardHeader>
                   <CardTitle>{item.title}</CardTitle>
                 </CardHeader>
@@ -218,7 +221,7 @@ export default function Dashboard() {
             ))}
           </div>
 
-          <Card>
+          <Card style={{ backgroundColor: "#f2d1cc" }}>
             <CardHeader>
               <CardTitle className="text-lg md:text-xl">
                 Eligibility Feedback

@@ -51,10 +51,10 @@ const schema = z.object({
 
 /* upload groups */
 const sections = [
-  { key: "bank", label: "Bank Statements" },
-  { key: "income", label: "Income Data" },
-  { key: "savings", label: "Savings Data" },
-  { key: "personal", label: "Personal Info" },
+  { key: "bank", label: "Bank Statements", bg: "#f5e8af" }, // panel-100
+  { key: "income", label: "Income Data", bg: "#fadbc8" }, // eligibility-100
+  { key: "savings", label: "Savings Data", bg: "#d9e3e8" }, // sky-100
+  { key: "personal", label: "Personal Info", bg: "#c3b0bc" }, // yam-100
 ] as const;
 
 /* ------------------------------------------------------------------ */
@@ -225,7 +225,10 @@ export default function InputStatement() {
         <Form {...form}>
           <form className="space-y-4">
             {/* customer block */}
-            <Card className="mt-5 flex flex-col p-6">
+            <Card
+              className="mt-5 flex flex-col p-6"
+              style={{ backgroundColor: "#f2d1cc" }}
+            >
               <Label className="mb-2 text-lg font-semibold">
                 Customer&apos;s Information
               </Label>
@@ -267,8 +270,12 @@ export default function InputStatement() {
 
             {/* file grid */}
             <div className="my-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              {sections.map(({ key, label }) => (
-                <Card key={key} className="pt-3">
+              {sections.map(({ key, label, bg }) => (
+                <Card
+                  key={key}
+                  className="pt-3"
+                  style={{ backgroundColor: bg }}
+                >
                   <Label className="ml-5 mb-2 text-lg font-semibold">
                     {label}
                   </Label>
@@ -327,7 +334,7 @@ export default function InputStatement() {
                 <AlertDialogTrigger asChild>
                   <Button
                     type="button"
-                    className="bg-black text-white hover:bg-black/80"
+                    className="bg-[#90d363] text-white hover:bg-[#90d363]/80"
                     onClick={() =>
                       form.trigger().then((ok) => ok && setDialogOpen(true))
                     }
