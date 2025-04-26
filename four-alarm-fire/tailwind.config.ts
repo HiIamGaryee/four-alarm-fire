@@ -40,6 +40,17 @@ const config: Config = {
   				DEFAULT: 'hsl(var(--destructive))',
   				foreground: 'hsl(var(--destructive-foreground))'
   			},
+			  peach: {
+				50:  "#FFF9EE",
+				100: "#FDEBD2",
+			  },
+			  panel: {
+				100: "#F5F5F5",
+			  },
+			  eligibility: {
+				100: "#E8F3D9",
+			  },
+			  accentGreen: "#44B78B",
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
