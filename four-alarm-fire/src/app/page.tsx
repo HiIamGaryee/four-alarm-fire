@@ -76,11 +76,6 @@ export default function Home() {
               </FormItem>
             )}
           />
-          <FormItem>
-            <Button className="w-full bg-black text-white hover:bg-black/80">
-              Sign in
-            </Button>
-          </FormItem>
         </Form>
       </Card>
       <div className="mt-5 flex gap-4">
@@ -126,7 +121,7 @@ export default function Home() {
           </FileUpload>
         </Card>
         <Card className="mb-5 pt-3">
-          <Label className="font-semibold text-lg mb-2 ml-5">Income Data</Label>
+          <Label className="font-semibold text-lg mb-2 ml-5">Spendings</Label>
           <FileUpload
             maxFiles={2}
             maxSize={5 * 1024 * 1024}
@@ -167,7 +162,7 @@ export default function Home() {
           </FileUpload>
         </Card>
         <Card className="mb-5 pt-3">
-          <Label className="font-semibold text-lg mb-2 ml-5">Income Data</Label>
+          <Label className="font-semibold text-lg mb-2 ml-5">Payments</Label>
           <FileUpload
             maxFiles={2}
             maxSize={5 * 1024 * 1024}
@@ -208,7 +203,7 @@ export default function Home() {
           </FileUpload>
         </Card>
         <Card className="mb-5 pt-3">
-          <Label className="font-semibold text-lg mb-2 ml-5">Income Data</Label>
+          <Label className="font-semibold text-lg mb-2 ml-5">Savings</Label>
           <FileUpload
             maxFiles={2}
             maxSize={5 * 1024 * 1024}
@@ -249,6 +244,9 @@ export default function Home() {
           </FileUpload>
         </Card>
       </div>
+      <Button className="w-full bg-black text-white hover:bg-black/80 mb-5">
+        Save & Submit
+      </Button>
     </div>
   );
 }
