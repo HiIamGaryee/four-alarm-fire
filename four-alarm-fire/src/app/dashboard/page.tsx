@@ -25,6 +25,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GaugeMeter } from "@/components/ui/gauge-meter";
 import React, { useEffect } from "react";
 import { useUploadStore } from "@/stores/upload";
+import { RiskGauge } from "@/components/RiskGauge";
 
 const barConfig = {
   spending: {
@@ -50,6 +51,7 @@ const chartConfig: ChartConfig = {
 export default function Dashboard() {
   const [data, setData] = React.useState<{
     creditScore: number;
+    riskPercent: number;
     incomeMonthly: number;
     debtsMonthly: number;
     utilization: number;
@@ -57,6 +59,7 @@ export default function Dashboard() {
     rentPayments: number[];
   }>({
     creditScore: 0,
+    riskPercent: 0,
     incomeMonthly: 0,
     debtsMonthly: 0,
     utilization: 0,
@@ -71,6 +74,7 @@ export default function Dashboard() {
         const parsed = JSON.parse(stored);
         setData({
           creditScore: parsed.creditScore || 0,
+          riskPercent: parsed.riskPercent || 0,
           incomeMonthly: parsed.incomeData || 0,
           debtsMonthly: parsed.debtToIncome
             ? parsed.debtToIncome * (parsed.incomeData || 1)
@@ -80,10 +84,23 @@ export default function Dashboard() {
           rentPayments: parsed.rentTimeline || [],
         });
       }
-    } catch {
-      // ignore error, keep default
+    } catch (error) {
+      console.error("Error parsing stored AI report:", error);
+      // Handle the error appropriately, maybe set default data or show a message
     }
   }, []);
+
+  const getRiskColor = (riskValue: number): string => {
+    if (riskValue < 40) {
+      return "green";
+    } else if (riskValue <= 70) {
+      return "yellow";
+    } else {
+      return "red";
+    }
+  };
+
+  const riskColor = getRiskColor(data.riskPercent);
 
   const { parsedData } = useUploadStore();
 
@@ -335,12 +352,17 @@ export default function Dashboard() {
             <CardTitle className="text-lg md:text-xl">Risk Meter</CardTitle>
           </CardHeader>
           <CardContent>
-            <GaugeMeter
+            <RiskGauge
+              riskValue={data.riskPercent}
+              label="Risk Level"
+              color={riskColor}
+            />
+            {/* <GaugeMeter
               value={data.creditScore > 0 ? 100 - data.creditScore / 10 : 50}
               size="md"
               label="Risk Meter"
               showValue
-            />
+            /> */}
           </CardContent>
         </Card>
       </div>
