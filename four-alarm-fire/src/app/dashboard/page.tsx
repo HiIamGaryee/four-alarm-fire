@@ -26,6 +26,8 @@ import { GaugeMeter } from "@/components/ui/gauge-meter";
 import React, { useEffect } from "react";
 import { useUploadStore } from "@/stores/upload";
 import { RiskGauge } from "@/components/RiskGauge";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 const barConfig = {
   spending: {
@@ -101,6 +103,7 @@ export default function Dashboard() {
   };
 
   const riskColor = getRiskColor(data.riskPercent);
+  const router = useRouter();
 
   const { parsedData } = useUploadStore();
 
@@ -109,8 +112,12 @@ export default function Dashboard() {
   return (
     <div className="p-4">
       <SidebarTrigger className="mb-4" />
-      <h1 className="text-2xl md:text-3xl font-semibold mb-6">Dashboard</h1>
-
+      <div className="flex justify-between">
+        <h1 className="text-2xl md:text-3xl font-semibold mb-6">Dashboard</h1>
+        <Button variant="outline" onClick={() => router.push("/ask-ai")}>
+          Ask Ai
+        </Button>{" "}
+      </div>
       {/* Top Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="flex justify-center items-center">
@@ -181,11 +188,15 @@ export default function Dashboard() {
             {[
               {
                 title: "Income Data",
-                value: data.incomeMonthly ? `RM ${data.incomeMonthly}` : "-",
+                value: data.incomeMonthly
+                  ? `RM ${data.incomeMonthly.toFixed(2)}`
+                  : "-",
               },
               {
                 title: "Debt-to-Income",
-                value: data.debtsMonthly ? `RM ${data.debtsMonthly}` : "-",
+                value: data.debtsMonthly
+                  ? `RM ${data.debtsMonthly.toFixed(2)}`
+                  : "-",
               },
               {
                 title: "Utilization Rate",

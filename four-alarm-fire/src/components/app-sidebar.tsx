@@ -31,7 +31,7 @@ export function AppSidebar() {
       <SidebarContent className="bg-black text-white">
         <SidebarGroup>
           <SidebarGroupLabel className="text-gray-300 text-2xl font-semibold ml-4 mb-4 mt-4">
-            Four Alarm Fire
+            MyGage
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
