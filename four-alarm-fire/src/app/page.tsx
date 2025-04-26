@@ -292,6 +292,14 @@ export default function InputStatement() {
                       Submit your statement?
                     </AlertDialogTitle>
                   </AlertDialogHeader>
+                  <div className="text-center text-gray-600">
+                    By proceeding with the submission, you hereby grant your
+                    explicit consent for the collection, processing, and storage
+                    of your personal data in accordance with our established
+                    Privacy Policy. Please ensure you have reviewed and
+                    understood the terms outlined therein regarding the handling
+                    of your information.
+                  </div>
                   <AlertDialogFooter className="flex justify-center gap-4">
                     <Button
                       variant="outline"

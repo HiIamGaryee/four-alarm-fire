@@ -215,7 +215,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <h3 className="font-medium">
-                {data.creditScore >= 700
+                {data.creditScore >= 600
                   ? "You are eligible for the best rates."
                   : data.creditScore > 0
                     ? "You may have average rates."

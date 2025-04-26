@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 
 interface RiskGaugeProps {
   label?: string;
-  riskValue: number;
+  riskValue?: number;
   className?: string;
   valueClassName?: string;
   labelClassName?: string;
@@ -49,7 +49,7 @@ const renderCustomizedLabel = ({
 };
 
 export function RiskGauge({
-  riskValue,
+  riskValue = 0,
   label = "Risk Level",
   className,
   valueClassName,
