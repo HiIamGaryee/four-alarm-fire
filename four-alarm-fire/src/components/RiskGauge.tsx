@@ -1,14 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  LabelList,
-  Label,
-} from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Label } from "recharts";
 import { cn } from "@/lib/utils";
 
 interface RiskGaugeProps {
@@ -19,34 +12,6 @@ interface RiskGaugeProps {
   labelClassName?: string;
   color?: string;
 }
-
-const RADIAN = Math.PI / 180;
-
-const renderCustomizedLabel = ({
-  cx,
-  cy,
-  midAngle,
-  innerRadius,
-  outerRadius,
-  percent,
-  index,
-}: any) => {
-  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-  const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-  return percent > 0.01 ? (
-    <text
-      x={x}
-      y={y}
-      fill="black"
-      textAnchor={x > cx ? "start" : "end"}
-      dominantBaseline="central"
-    >
-      {`${(percent * 100).toFixed(0)}%`}
-    </text>
-  ) : null;
-};
 
 export function RiskGauge({
   riskValue = 0,
@@ -68,7 +33,7 @@ export function RiskGauge({
     <div
       className={cn(
         "relative flex flex-col items-center justify-center",
-        className
+        className,
       )}
     >
       <ResponsiveContainer width={180} height={120}>

@@ -1,8 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useUploadStore } from "@/stores/upload";
-import Tesseract, { createWorker } from "tesseract.js";
+import Tesseract from "tesseract.js";
 import * as pdfjsLib from "pdfjs-dist";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -20,7 +19,13 @@ import {
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import {
@@ -76,7 +81,7 @@ export default function InputStatement() {
 
   /* files per section */
   const [files, setFiles] = React.useState<Record<string, File[]>>(
-    Object.fromEntries(sections.map(({ key }) => [key, []]))
+    Object.fromEntries(sections.map(({ key }) => [key, []])),
   );
   const handleFiles = (key: string) => (newFiles: File[]) =>
     setFiles((prev) => ({ ...prev, [key]: newFiles }));
@@ -134,7 +139,7 @@ export default function InputStatement() {
         // If parsing failed and the text is empty, use a hardcoded value
         if (!parsedText.trim()) {
           console.warn(
-            `Failed to parse files for section "${key}". Using hardcoded value.`
+            `Failed to parse files for section "${key}". Using hardcoded value.`,
           );
           out[key] = `Hardcoded data for ${key} due to parsing failure.`;
         }
@@ -262,6 +267,7 @@ export default function InputStatement() {
                                 : "text"
                         }
                       />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
