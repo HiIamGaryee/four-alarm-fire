@@ -1,0 +1,140 @@
+[
+  {
+    "bankName": "Maybank",
+    "flatRateInterest": 4.5,
+    "minimumMonthlyIncome": 2500,
+    "maxDSR": {
+      "netIncomeBelow3500": 40,
+      "netIncomeAbove3500": 70
+    }
+  },
+  {
+    "bankName": "CIMB Bank",
+    "flatRateInterest": 4.8,
+    "minimumMonthlyIncome": 2000,
+    "maxDSR": {
+      "netIncomeBelow3000": 65,
+      "netIncomeAbove3000": 75
+    }
+  },
+  {
+    "bankName": "Public Bank",
+    "flatRateInterest": 4.3,
+    "minimumMonthlyIncome": 2000,
+    "maxDSR": {
+      "netIncomeBelow3000": 60,
+      "netIncomeAbove3000": 70
+    }
+  },
+  {
+    "bankName": "Hong Leong Bank",
+    "flatRateInterest": 4.6,
+    "minimumMonthlyIncome": 2000,
+    "maxDSR": {
+      "netIncomeBelow3000": 60,
+      "netIncomeAbove3000": 80
+    }
+  },
+  {
+    "bankName": "RHB Bank",
+    "flatRateInterest": 5.0,
+    "minimumMonthlyIncome": 2500,
+    "maxDSR": {
+      "netIncomeBelow2204": 55,
+      "netIncomeAbove2205": 60
+    }
+  },
+  {
+    "bankName": "AmBank",
+    "flatRateInterest": 5.2,
+    "minimumMonthlyIncome": 3000,
+    "maxDSR": {
+      "netIncomeBelow10000": 70,
+      "netIncomeAbove10000": 75
+    }
+  },
+  {
+    "bankName": "Affin Bank",
+    "flatRateInterest": 4.7,
+    "minimumMonthlyIncome": 2000,
+    "maxDSR": {
+      "grossIncomeBelow5000": 60,
+      "grossIncomeAbove5000": 80
+    }
+  },
+  {
+    "bankName": "Alliance Bank",
+    "flatRateInterest": 4.9,
+    "minimumMonthlyIncome": 2500,
+    "maxDSR": {
+      "netIncomeBelow3000": 60,
+      "netIncomeAbove3000": 70
+    }
+  },
+  {
+    "bankName": "Bank Islam",
+    "flatRateInterest": 4.4,
+    "minimumMonthlyIncome": 2000,
+    "maxDSR": {
+      "netIncomeBelow3000": 50,
+      "netIncomeAbove3000": 70
+    }
+  },
+  {
+    "bankName": "Bank Muamalat",
+    "flatRateInterest": 4.6,
+    "minimumMonthlyIncome": 1800,
+    "maxDSR": {
+      "netIncomeBelow3000": 60,
+      "netIncomeAbove3000": 70
+    }
+  },
+  {
+    "bankName": "Standard Chartered Bank",
+    "flatRateInterest": 5.1,
+    "minimumMonthlyIncome": 3000,
+    "maxDSR": {
+      "netIncomeBelow3000": 60,
+      "netIncomeAbove3000": 70
+    }
+  },
+  {
+    "bankName": "HSBC Malaysia",
+    "flatRateInterest": 4.8,
+    "minimumMonthlyIncome": 5000,
+    "maxDSR": {
+      "netIncomeBelow3000": 60,
+      "netIncomeAbove3000": 70
+    }
+  },
+  {
+    "bankName": "OCBC Bank",
+    "flatRateInterest": 5.3,
+    "minimumMonthlyIncome": 3500,
+    "maxDSR": {
+      "netIncomeBelow3000": 60,
+      "netIncomeAbove3000": 70
+    }
+  },
+  {
+    "bankName": "UOB Malaysia",
+    "flatRateInterest": 5.0,
+    "minimumMonthlyIncome": 4000,
+    "maxDSR": {
+      "grossIncomeBelow3000": 60,
+      "grossIncome3000to5000": 65,
+      "grossIncome5000to7000": 75,
+      "grossIncome8000to15000": 80,
+      "grossIncomeAbove15000": 85
+    }
+  },
+  {
+    "bankName": "Citibank Malaysia",
+    "flatRateInterest": 4.9,
+    "minimumMonthlyIncome": 4000,
+    "maxDSR": {
+      "netIncomeBelow3000": 60,
+      "netIncomeAbove3000": 70
+    }
+  }
+]
