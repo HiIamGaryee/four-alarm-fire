@@ -22,6 +22,7 @@ import {
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GaugeMeter } from "@/components/ui/gauge-meter";
+import { useUploadStore } from "@/stores/upload";
 
 const chartData = [{ creditScore: 720 }];
 
@@ -77,6 +78,9 @@ const chartConfig: ChartConfig = {
 };
 
 export default function Dashboard() {
+  const { parsedData } = useUploadStore();
+
+  console.log(parsedData);
   return (
     <div>
       <SidebarTrigger className="ml-5 mt-5" />
