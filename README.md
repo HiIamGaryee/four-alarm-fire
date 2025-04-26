@@ -49,7 +49,6 @@ This system aims to provide a more inclusive and fair assessment of creditworthi
   - React
 
 - **Backend**
-  - Python
   - FastAPI (for API development)
   - Machine Learning models for scoring
 
@@ -58,7 +57,6 @@ This system aims to provide a more inclusive and fair assessment of creditworthi
 ### Prerequisites
 
 - Node.js (v14 or higher)
-- Python (v3.8 or higher)
 - npm or yarn
 
 ### Installation
@@ -78,17 +76,11 @@ npm install
 yarn install
 ```
 
-3. Install backend dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-4. Set up environment variables:
+3. Set up environment variables:
 
 ```bash
 cp .env.example .env
-# Edit .env with your configuration
+# OPENAI_API_KEY=xxxx(open_ai_key)
 ```
 
 ### Running the Application
@@ -102,28 +94,7 @@ npm run dev
 yarn dev
 ```
 
-2. Start the backend server:
-
-```bash
-python main.py
-```
-
 The application will be available at `http://localhost:3000`
-
-## 📊 Project Structure
-
-```
-alternative-credit-scoring/
-├── frontend/           # Next.js application
-│   ├── components/     # React components
-│   ├── pages/         # Next.js pages
-│   └── styles/        # Tailwind CSS styles
-├── backend/           # Python backend
-│   ├── models/        # ML models
-│   ├── api/          # API endpoints
-│   └── utils/        # Utility functions
-└── docs/             # Documentation
-```
 
 ## 🤝 Contributing
 

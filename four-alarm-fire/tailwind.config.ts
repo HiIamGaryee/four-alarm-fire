@@ -10,7 +10,7 @@ const config: Config = {
   theme: {
   	extend: {
   		colors: {
-  			background: 'hsl(var(--background))',
+  			background: '#ebe5d7',
   			foreground: 'hsl(var(--foreground))',
   			card: {
   				DEFAULT: 'hsl(var(--card))',
@@ -49,6 +49,11 @@ const config: Config = {
 			  },
 			  eligibility: {
 				100: "#E8F3D9",
+			  }, sky: {
+				100: "#d9e3e8",
+			  },yam: {
+				50:  "#fbdfdb",
+				100: "#c3b0bc",
 			  },
 			  accentGreen: "#44B78B",
   			border: 'hsl(var(--border))',
