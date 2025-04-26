@@ -68,12 +68,11 @@ export default function AskAi() {
             <BotBubble>
               I'm a GageBot. How can I help you today sweetheart?
             </BotBubble>
-
             {[
               "Explain more on my report",
               "What is my annual income",
+              "Best Housing Loan for Me",
               "Explain Flexible Tenure",
-              "All Housing Loan in Malaysia",
               "Knowledgebase & FAQ to get a loan",
             ].map((q) => (
               <QuickBtn key={q} onClick={() => setInput(q)}>
@@ -87,7 +86,20 @@ export default function AskAi() {
           m.role === "user" ? (
             <UserBubble key={i}>{m.text}</UserBubble>
           ) : (
-            <BotBubble key={i}>{m.text}</BotBubble>
+            <>
+              <BotBubble key={i}>{m.text}</BotBubble>{" "}
+              {[
+                "Explain more on my report",
+                "What is my annual income",
+                "Best Housing Loan for Me",
+                "Explain Flexible Tenure",
+                "Knowledgebase & FAQ to get a loan",
+              ].map((q) => (
+                <QuickBtn key={q} onClick={() => setInput(q)}>
+                  {q}
+                </QuickBtn>
+              ))}{" "}
+            </>
           )
         )}
 
