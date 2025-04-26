@@ -1,6 +1,9 @@
 "use client";
 
 import * as React from "react";
+import { useUploadStore } from "@/stores/upload";
+import Tesseract, { createWorker } from "tesseract.js";
+import * as pdfjsLib from "pdfjs-dist";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -45,9 +48,32 @@ const uploadSections = [
   { key: "personal", label: "Personal Info" },
 ] as const;
 
+// pdfjsLib.GlobalWorkerOptions.workerSrc = `/_next/static/worker/pdf.worker.min.mjs`;
+
 export default function InputStatement() {
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    const loadPdfWorker = async () => {
+      // Dynamic import avoids the TypeScript declaration error
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+    };
+
+    loadPdfWorker();
+  }, []);
+
+  const [parsedData, setParsedData] = React.useState<{
+    bank: any;
+    income: any;
+    savings: any;
+    personal: any;
+  }>({
+    bank: null,
+    income: null,
+    savings: null,
+    personal: null,
+  });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -60,24 +86,126 @@ export default function InputStatement() {
   });
 
   const [files, setFiles] = React.useState<Record<string, File[]>>(
-    Object.fromEntries(uploadSections.map(({ key }) => [key, []]))
+    Object.fromEntries(uploadSections.map(({ key }) => [key, []])),
   );
 
   const handleFiles =
-    (key: string) => (e: React.ChangeEvent<HTMLInputElement> | File[]) => {
-      const selected =
-        e instanceof Array
-          ? e
-          : e.target.files
-            ? Array.from(e.target.files)
-            : [];
-      setFiles((prev) => ({ ...prev, [key]: selected }));
-      // TODO: parse PDFs ⇒ update dashboard metrics
+    (key: (typeof uploadSections)[number]["key"]) =>
+    async (newFiles: File[]) => {
+      setFiles((prev) => ({
+        ...prev,
+        [key]: newFiles,
+      }));
+
+      // parse files immediately after upload
+      if (newFiles.length > 0) {
+        const parsed = await parseFiles(newFiles, key);
+        setParsedData((prev) => ({
+          ...prev,
+          [key]: parsed,
+        }));
+      }
     };
 
-  const onSubmit = () => {
-    setLoading(true);
-    setTimeout(() => router.push("/dashboard"), 3000);
+  const parseAllFiles = async (files: Record<string, File[]>) => {
+    const results: Record<string, string> = {};
+
+    try {
+      const worker = await createWorker("eng"); // load English model once
+      for (const key of Object.keys(files)) {
+        const sectionFiles = files[key];
+        const parsed = await parseFiles(sectionFiles, key);
+
+        results[key] = Array.isArray(parsed) ? parsed.join("\n\n") : parsed;
+      }
+
+      await worker.terminate(); // clean up
+    } catch (error) {
+      console.error("Error parsing files:", error);
+    }
+
+    return results;
+  };
+
+  const extractTextFromFile = async (worker: any, file: File) => {
+    const arrayBuffer = await file.arrayBuffer();
+    const blob = new Blob([arrayBuffer]);
+    const imageBitmap = await createImageBitmap(blob);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = imageBitmap.width;
+    canvas.height = imageBitmap.height;
+    const ctx = canvas.getContext("2d");
+    ctx?.drawImage(imageBitmap, 0, 0);
+
+    const {
+      data: { text },
+    } = await worker.recognize(canvas);
+
+    return text;
+  };
+  async function parseFiles(files: File[], key: string) {
+    const results: string[] = [];
+
+    for (const file of files) {
+      if (file.type.includes("image")) {
+        // OCR for images
+        const text = await extractTextFromImage(file);
+        results.push(text);
+      } else if (file.type.includes("pdf")) {
+        // Extract text from PDFs
+        const text = await extractTextFromPdf(file);
+        results.push(text);
+      } else {
+        // fallback
+        const text = await file.text();
+        results.push(text);
+      }
+    }
+
+    return results.length === 1 ? results[0] : results;
+  }
+
+  async function extractTextFromImage(file: File) {
+    try {
+      const { data } = await Tesseract.recognize(file, "eng", {
+        logger: (m) => console.log(m), // optional for progress
+      });
+      return data.text;
+    } catch (error) {
+      console.error("Error extracting text from image:", error);
+      return `[Error processing image: ${file.name}]`;
+    }
+  }
+
+  async function extractTextFromPdf(file: File) {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let textContent = "";
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const strings = content.items.map((item: any) => item.str);
+      textContent += strings.join(" ") + "\n";
+    }
+
+    return textContent;
+  }
+
+  const onSubmit = async () => {
+    try {
+      setLoading(true);
+      const parsed = await parseAllFiles(files);
+      useUploadStore.getState().setParsedData(parsed);
+      setLoading(false);
+
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -219,6 +347,7 @@ export default function InputStatement() {
               <Button
                 type="submit"
                 className="bg-black text-white hover:bg-black/80"
+                onClick={onSubmit}
               >
                 Save & Submit
               </Button>
