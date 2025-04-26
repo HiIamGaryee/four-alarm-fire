@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/chart";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { GaugeMeter } from "@/components/ui/gauge-meter";
 
 const chartData = [{ creditScore: 720 }];
 
@@ -258,6 +259,12 @@ export default function Dashboard() {
                 />
               </LineChart>
             </ChartContainer>
+          </CardContent>
+        </Card>
+        <Card className="col-span-1 border-none shadow-none">
+          <CardTitle className="text-xl pt-1 mb-5">Risk Meter</CardTitle>
+          <CardContent>
+            <GaugeMeter value={50} size="md" label="Risk Meter" showValue />
           </CardContent>
         </Card>
       </div>
