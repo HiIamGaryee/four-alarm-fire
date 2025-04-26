@@ -72,6 +72,7 @@ git clone
 2. Install frontend dependencies:
 
 ```bash
+cd four-alarm-fire
 npm install
 # or
 yarn install
@@ -95,6 +96,7 @@ cp .env.example .env
 1. Start the frontend development server:
 
 ```bash
+cd four-alarm-fire
 npm run dev
 # or
 yarn dev
