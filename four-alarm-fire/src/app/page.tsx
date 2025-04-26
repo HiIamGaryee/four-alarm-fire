@@ -20,7 +20,13 @@ import {
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import {
@@ -262,6 +268,7 @@ export default function InputStatement() {
                                 : "text"
                         }
                       />
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
