@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/chart";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { GaugeMeter } from "@/components/ui/gauge-meter";
 import React, { useEffect } from "react";
 import { useUploadStore } from "@/stores/upload";
 import { RiskGauge } from "@/components/RiskGauge";
@@ -371,12 +370,6 @@ export default function Dashboard() {
               label="Risk Level"
               color={riskColor}
             />
-            {/* <GaugeMeter
-              value={data.creditScore > 0 ? 100 - data.creditScore / 10 : 50}
-              size="md"
-              label="Risk Meter"
-              showValue
-            /> */}
           </CardContent>
         </Card>
       </div>
