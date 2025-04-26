@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -39,17 +38,7 @@ const formSchema = z.object({
   email: z.string().email("Invalid"),
 });
 
-const uploadSections = [
-  { key: "bank", label: "Bank Statements" },
-  { key: "income", label: "Income Data" },
-  { key: "savings", label: "Savings Data" },
-  { key: "personal", label: "Personal Info" },
-] as const;
-
 export default function InputStatement() {
-  const router = useRouter();
-  const [loading, setLoading] = React.useState(false);
-
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -61,23 +50,6 @@ export default function InputStatement() {
   });
 
   const [files, setFiles] = React.useState<File[]>([]);
-
-  const handleFiles =
-    (key: string) => (e: React.ChangeEvent<HTMLInputElement> | File[]) => {
-      const selected =
-        e instanceof Array
-          ? e
-          : e.target.files
-            ? Array.from(e.target.files)
-            : [];
-      setFiles((prev) => ({ ...prev, [key]: selected }));
-      // TODO: parse PDFs ⇒ update dashboard metrics
-    };
-
-  const onSubmit = () => {
-    setLoading(true);
-    setTimeout(() => router.push("/dashboard"), 3000);
-  };
 
   return (
     <div className="h-full w-full px-5 pt-5">
