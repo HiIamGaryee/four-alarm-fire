@@ -5,12 +5,68 @@ import {
   PolarRadiusAxis,
   RadialBar,
   RadialBarChart,
+  Bar,
+  BarChart,
+  Line,
+  LineChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
 } from "recharts";
-import { ChartConfig, ChartContainer } from "@/components/ui/chart";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const chartData = [{ creditScore: 720 }];
+
+const spendingData = [
+  { month: "Jan", spending: 2000 },
+  { month: "Feb", spending: 1800 },
+  { month: "Mar", spending: 1900 },
+  { month: "Apr", spending: 2100 },
+  { month: "May", spending: 2200 },
+  { month: "Jun", spending: 2300 },
+  { month: "Jul", spending: 2400 },
+  { month: "Aug", spending: 2500 },
+  { month: "Sep", spending: 2600 },
+  { month: "Oct", spending: 2700 },
+  { month: "Nov", spending: 2800 },
+  { month: "Dec", spending: 2900 },
+];
+
+const rentPaymentsData = [
+  { month: "Jan", payments: 2000 },
+  { month: "Feb", payments: 1800 },
+  { month: "Mar", payments: 1900 },
+  { month: "Apr", payments: 2100 },
+  { month: "May", payments: 2200 },
+  { month: "Jun", payments: 2300 },
+  { month: "Jul", payments: 2400 },
+  { month: "Aug", payments: 2500 },
+  { month: "Sep", payments: 2600 },
+  { month: "Oct", payments: 2700 },
+  { month: "Nov", payments: 2800 },
+  { month: "Dec", payments: 2900 },
+];
+
+const barConfig = {
+  spending: {
+    label: "Spending",
+    color: "hsl(var(--chart-1))",
+  },
+} satisfies ChartConfig;
+
+const lineConfig = {
+  payments: {
+    label: "Payments",
+    color: "hsl(var(--chart-2))",
+  },
+} satisfies ChartConfig;
 
 const chartConfig: ChartConfig = {
   creditScore: {
@@ -26,11 +82,11 @@ export default function Dashboard() {
       <h1 className="text-3xl font-semibold mt-5 ml-5">Dashboard</h1>
       <div className="grid grid-cols-3 gap-4 mt-5 mr-5">
         <div>
-          <Card className="flex flex-col ml-5 col-span-1">
+          <Card className="ml-5 col-span-1">
             <CardContent className="flex flex-1 items-center pb-0">
               <ChartContainer
                 config={chartConfig}
-                className="mx-auto aspect-square w-full"
+                className="mx-auto aspect-square w-[286px]"
               >
                 <RadialBarChart
                   data={chartData}
@@ -133,6 +189,77 @@ export default function Dashboard() {
             </Card>
           </div>
         </div>
+      </div>
+      <div className="grid grid-cols-3 gap-4 mt-5 ml-5">
+        <Card className="col-span-1 border-none shadow-none">
+          <CardTitle className="text-xl pt-1 mb-5">Monthly Spending</CardTitle>
+          <CardContent className="flex flex-1 items-center pb-0 w-full">
+            <ChartContainer config={barConfig} className="mx-auto w-full">
+              <BarChart
+                data={spendingData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="month"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  tickFormatter={(value) => value.slice(0, 3)}
+                />
+                <YAxis
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  tickFormatter={(value) => `$${value}`}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
+                />
+                <Bar dataKey="spending" fill="blue" radius={8} />
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+        <Card className="col-span-1 border-none shadow-none">
+          <CardTitle className="text-xl pt-1 mb-5">
+            Rent Payments Timeline
+          </CardTitle>
+          <CardContent className="flex flex-1 items-center pb-0 w-full">
+            <ChartContainer config={lineConfig} className="mx-auto w-full">
+              <LineChart
+                data={rentPaymentsData}
+                margin={{ right: 12, left: 12 }}
+              >
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="month"
+                  tickLine={false}
+                  tickMargin={8}
+                  axisLine={false}
+                  tickFormatter={(value) => value.slice(0, 3)}
+                />
+                <YAxis
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  tickFormatter={(value) => `$${value}`}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
+                />
+                <Line
+                  dataKey="payments"
+                  stroke="blue"
+                  dot={{ fill: "blue" }}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
