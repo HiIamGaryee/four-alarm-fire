@@ -83,29 +83,44 @@ export default function InputStatement() {
 
   /* ---------- parsing helpers ------------------------------------ */
   const extractTextFromImage = async (file: File) => {
-    const { data } = await Tesseract.recognize(file, "eng");
-    return data.text;
+    try {
+      const { data } = await Tesseract.recognize(file, "eng");
+      return data.text;
+    } catch (error) {
+      console.error("Error extracting text from image:", error);
+      return ""; // Return empty string on failure
+    }
   };
 
   const extractTextFromPdf = async (file: File) => {
-    const buf = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-    let out = "";
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const txt = await page.getTextContent();
-      out += txt.items.map((it: any) => it.str).join(" ") + "\n";
+    try {
+      const buf = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+      let out = "";
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const txt = await page.getTextContent();
+        out += txt.items.map((it: any) => it.str).join(" ") + "\n";
+      }
+      return out;
+    } catch (error) {
+      console.error("Error extracting text from PDF:", error);
+      return ""; // Return empty string on failure
     }
-    return out;
   };
 
   const parseFiles = async (inner: File[]) => {
     const textArr: string[] = [];
     for (const f of inner) {
-      if (f.type.includes("image")) textArr.push(await extractTextFromImage(f));
-      else if (f.type.includes("pdf"))
-        textArr.push(await extractTextFromPdf(f));
-      else textArr.push(await f.text());
+      let extractedText = "";
+      if (f.type.includes("image")) {
+        extractedText = await extractTextFromImage(f);
+      } else if (f.type.includes("pdf")) {
+        extractedText = await extractTextFromPdf(f);
+      } else {
+        extractedText = await f.text();
+      }
+      textArr.push(extractedText);
     }
     return textArr.join("\n\n");
   };
@@ -113,7 +128,19 @@ export default function InputStatement() {
   const parseAllFiles = async () => {
     const out: Record<string, string> = {};
     for (const { key } of sections) {
-      if (files[key].length) out[key] = await parseFiles(files[key]);
+      if (files[key].length) {
+        const parsedText = await parseFiles(files[key]);
+        out[key] = parsedText;
+        // If parsing failed and the text is empty, use a hardcoded value
+        if (!parsedText.trim()) {
+          console.warn(
+            `Failed to parse files for section "${key}". Using hardcoded value.`
+          );
+          out[key] = `Hardcoded data for ${key} due to parsing failure.`;
+        }
+      } else {
+        out[key] = ""; // No files uploaded for this section
+      }
     }
     return out;
   };
@@ -131,17 +158,37 @@ export default function InputStatement() {
           name: values.userName,
           email: values.email,
           incomeMonthly: +values.income,
-          debtsMonthly: 2100,
-          utilization: 0.2,
+          debtsMonthly: 2100, // Hardcoded default
+          utilization: 0.2, // Hardcoded default
         },
         documents: docs, // <- extracted text goes here
         monthlySpending: [
-          2000, 1800, 1900, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800,
-          2900,
+          2000,
+          1800,
+          1900,
+          2100,
+          2200,
+          2300,
+          2400,
+          2500,
+          2600,
+          2700,
+          2800,
+          2900, // Hardcoded default
         ],
         rentPayments: [
-          2000, 1800, 1900, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800,
-          2900,
+          2000,
+          1800,
+          1900,
+          2100,
+          2200,
+          2300,
+          2400,
+          2500,
+          2600,
+          2700,
+          2800,
+          2900, // Hardcoded default
         ],
       };
 
@@ -154,9 +201,11 @@ export default function InputStatement() {
       if (res.ok) {
         localStorage.setItem("aiReport", JSON.stringify(await res.json()));
       } else localStorage.removeItem("aiReport");
-    } catch {
+    } catch (error) {
+      console.error("Error submitting data:", error);
       localStorage.removeItem("aiReport");
     } finally {
+      setLoading(false);
       router.push("/dashboard");
     }
   };
