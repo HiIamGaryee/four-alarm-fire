@@ -8,6 +8,14 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
@@ -34,177 +42,122 @@ type FormValues = {
   email: string;
 };
 
-const formSchema = z.object({
-  userName: z.string().min(3, "Too short"),
-  income: z.string().min(1, "Required"),
-  dob: z.string().min(1, "Required"),
-  email: z.string().email("Invalid"),
+const schema = z.object({
+  userName: z.string().min(3),
+  income: z.string().min(1),
+  dob: z.string().min(1),
+  email: z.string().email(),
 });
 
-const uploadSections = [
+/* upload groups */
+const sections = [
   { key: "bank", label: "Bank Statements" },
   { key: "income", label: "Income Data" },
   { key: "savings", label: "Savings Data" },
   { key: "personal", label: "Personal Info" },
 ] as const;
 
-// pdfjsLib.GlobalWorkerOptions.workerSrc = `/_next/static/worker/pdf.worker.min.mjs`;
-
+/* ------------------------------------------------------------------ */
 export default function InputStatement() {
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
 
+  /* pdf.js worker path */
   React.useEffect(() => {
-    const loadPdfWorker = async () => {
-      // Dynamic import avoids the TypeScript declaration error
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
-    };
-
-    loadPdfWorker();
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
   }, []);
 
-  const [parsedData, setParsedData] = React.useState<{
-    bank: any;
-    income: any;
-    savings: any;
-    personal: any;
-  }>({
-    bank: null,
-    income: null,
-    savings: null,
-    personal: null,
-  });
-
+  /* form */
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      userName: "",
-      income: "",
-      dob: "",
-      email: "",
-    },
+    resolver: zodResolver(schema),
+    defaultValues: { userName: "", income: "", dob: "", email: "" },
   });
 
+  /* files per section */
   const [files, setFiles] = React.useState<Record<string, File[]>>(
-    Object.fromEntries(uploadSections.map(({ key }) => [key, []])),
+    Object.fromEntries(sections.map(({ key }) => [key, []]))
   );
+  const handleFiles = (key: string) => (newFiles: File[]) =>
+    setFiles((prev) => ({ ...prev, [key]: newFiles }));
 
-  const handleFiles =
-    (key: (typeof uploadSections)[number]["key"]) =>
-    async (newFiles: File[]) => {
-      setFiles((prev) => ({
-        ...prev,
-        [key]: newFiles,
-      }));
-
-      // parse files immediately after upload
-      if (newFiles.length > 0) {
-        const parsed = await parseFiles(newFiles, key);
-        setParsedData((prev) => ({
-          ...prev,
-          [key]: parsed,
-        }));
-      }
-    };
-
-  const parseAllFiles = async (files: Record<string, File[]>) => {
-    const results: Record<string, string> = {};
-
-    try {
-      const worker = await createWorker("eng"); // load English model once
-      for (const key of Object.keys(files)) {
-        const sectionFiles = files[key];
-        const parsed = await parseFiles(sectionFiles, key);
-
-        results[key] = Array.isArray(parsed) ? parsed.join("\n\n") : parsed;
-      }
-
-      await worker.terminate(); // clean up
-    } catch (error) {
-      console.error("Error parsing files:", error);
-    }
-
-    return results;
+  /* ---------- parsing helpers ------------------------------------ */
+  const extractTextFromImage = async (file: File) => {
+    const { data } = await Tesseract.recognize(file, "eng");
+    return data.text;
   };
 
-  const extractTextFromFile = async (worker: any, file: File) => {
-    const arrayBuffer = await file.arrayBuffer();
-    const blob = new Blob([arrayBuffer]);
-    const imageBitmap = await createImageBitmap(blob);
-
-    const canvas = document.createElement("canvas");
-    canvas.width = imageBitmap.width;
-    canvas.height = imageBitmap.height;
-    const ctx = canvas.getContext("2d");
-    ctx?.drawImage(imageBitmap, 0, 0);
-
-    const {
-      data: { text },
-    } = await worker.recognize(canvas);
-
-    return text;
-  };
-  async function parseFiles(files: File[], key: string) {
-    const results: string[] = [];
-
-    for (const file of files) {
-      if (file.type.includes("image")) {
-        // OCR for images
-        const text = await extractTextFromImage(file);
-        results.push(text);
-      } else if (file.type.includes("pdf")) {
-        // Extract text from PDFs
-        const text = await extractTextFromPdf(file);
-        results.push(text);
-      } else {
-        // fallback
-        const text = await file.text();
-        results.push(text);
-      }
-    }
-
-    return results.length === 1 ? results[0] : results;
-  }
-
-  async function extractTextFromImage(file: File) {
-    try {
-      const { data } = await Tesseract.recognize(file, "eng", {
-        logger: (m) => console.log(m), // optional for progress
-      });
-      return data.text;
-    } catch (error) {
-      console.error("Error extracting text from image:", error);
-      return `[Error processing image: ${file.name}]`;
-    }
-  }
-
-  async function extractTextFromPdf(file: File) {
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    let textContent = "";
-
+  const extractTextFromPdf = async (file: File) => {
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+    let out = "";
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      const strings = content.items.map((item: any) => item.str);
-      textContent += strings.join(" ") + "\n";
+      const txt = await page.getTextContent();
+      out += txt.items.map((it: any) => it.str).join(" ") + "\n";
     }
+    return out;
+  };
 
-    return textContent;
-  }
+  const parseFiles = async (inner: File[]) => {
+    const textArr: string[] = [];
+    for (const f of inner) {
+      if (f.type.includes("image")) textArr.push(await extractTextFromImage(f));
+      else if (f.type.includes("pdf"))
+        textArr.push(await extractTextFromPdf(f));
+      else textArr.push(await f.text());
+    }
+    return textArr.join("\n\n");
+  };
 
-  const onSubmit = async () => {
+  const parseAllFiles = async () => {
+    const out: Record<string, string> = {};
+    for (const { key } of sections) {
+      if (files[key].length) out[key] = await parseFiles(files[key]);
+    }
+    return out;
+  };
+  /* --------------------------------------------------------------- */
+
+  const submit = async (values: FormValues) => {
+    setDialogOpen(false);
+    setLoading(true);
+
     try {
-      setLoading(true);
-      const parsed = await parseAllFiles(files);
-      useUploadStore.getState().setParsedData(parsed);
-      setLoading(false);
+      const docs = await parseAllFiles(); // OCR & PDF parse
 
-      router.push("/dashboard");
-    } catch (error) {
-      console.error("Error submitting form:", error);
+      const statement = {
+        customer: {
+          name: values.userName,
+          email: values.email,
+          incomeMonthly: +values.income,
+          debtsMonthly: 2100,
+          utilization: 0.2,
+        },
+        documents: docs, // <- extracted text goes here
+        monthlySpending: [
+          2000, 1800, 1900, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800,
+          2900,
+        ],
+        rentPayments: [
+          2000, 1800, 1900, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800,
+          2900,
+        ],
+      };
+
+      const res = await fetch("/api/generate-report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(statement),
+      });
+
+      if (res.ok) {
+        localStorage.setItem("aiReport", JSON.stringify(await res.json()));
+      } else localStorage.removeItem("aiReport");
+    } catch {
+      localStorage.removeItem("aiReport");
     } finally {
-      setLoading(false);
+      router.push("/dashboard");
     }
   };
 
@@ -219,80 +172,60 @@ export default function InputStatement() {
       <div className="h-full w-full px-5 pt-5">
         <SidebarTrigger />
         <h1 className="mt-5 text-3xl font-semibold">Input Statement</h1>
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form className="space-y-4">
+            {/* customer block */}
             <Card className="mt-5 flex flex-col p-6">
               <Label className="mb-2 text-lg font-semibold">
                 Customer&apos;s Information
               </Label>
 
-              <FormField
-                control={form.control}
-                name="userName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>User Name</FormLabel>
-                    <Input
-                      placeholder="Enter your name"
-                      {...field}
-                      autoComplete="off"
-                    />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="income"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Income (RM)</FormLabel>
-                    <Input
-                      type="number"
-                      placeholder="65000"
-                      {...field}
-                      autoComplete="off"
-                    />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="dob"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Date of Birth</FormLabel>
-                    <Input type="date" {...field} autoComplete="off" />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <Input
-                      type="email"
-                      placeholder="you@example.com"
-                      {...field}
-                    />
-                  </FormItem>
-                )}
-              />
+              {(["userName", "income", "dob", "email"] as const).map((name) => (
+                <FormField
+                  key={name}
+                  control={form.control}
+                  name={name}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {
+                          {
+                            userName: "User Name",
+                            income: "Income (RM)",
+                            dob: "Date of Birth",
+                            email: "Email",
+                          }[name]
+                        }
+                      </FormLabel>
+                      <Input
+                        {...field}
+                        type={
+                          name === "income"
+                            ? "number"
+                            : name === "dob"
+                              ? "date"
+                              : name === "email"
+                                ? "email"
+                                : "text"
+                        }
+                      />
+                    </FormItem>
+                  )}
+                />
+              ))}
             </Card>
 
+            {/* file grid */}
             <div className="my-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              {uploadSections.map(({ key, label }) => (
+              {sections.map(({ key, label }) => (
                 <Card key={key} className="pt-3">
                   <Label className="ml-5 mb-2 text-lg font-semibold">
                     {label}
                   </Label>
                   <FileUpload
                     value={files[key]}
-                    onValueChange={(f) => handleFiles(key)(f)}
+                    onValueChange={handleFiles(key)}
                     maxFiles={2}
                     maxSize={5 * 1024 * 1024}
                     multiple
@@ -307,24 +240,19 @@ export default function InputStatement() {
                           Drag &amp; drop files here
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          Or click to
-                          browse&nbsp;(max&nbsp;2,&nbsp;up&nbsp;to&nbsp;5&nbsp;MB)
+                          Or click to browse&nbsp;(max&nbsp;2,&nbsp;5&nbsp;MB)
                         </p>
                       </div>
                       <FileUploadTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="mt-2 w-fit"
-                        >
+                        <Button variant="outline" size="sm" className="mt-2">
                           Browse files
                         </Button>
                       </FileUploadTrigger>
                     </FileUploadDropzone>
 
                     <FileUploadList>
-                      {files[key].map((file, i) => (
-                        <FileUploadItem key={i} value={file}>
+                      {files[key].map((f, i) => (
+                        <FileUploadItem key={i} value={f}>
                           <FileUploadItemPreview />
                           <FileUploadItemMetadata />
                           <FileUploadItemDelete asChild>
@@ -343,45 +271,56 @@ export default function InputStatement() {
                 </Card>
               ))}
             </div>
-            <div className="justify-end flex">
-              <Button
-                type="submit"
-                className="bg-black text-white hover:bg-black/80"
-                onClick={onSubmit}
-              >
-                Save & Submit
-              </Button>
+
+            {/* confirm dialog */}
+            <div className="flex justify-end">
+              <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    type="button"
+                    className="bg-black text-white hover:bg-black/80"
+                    onClick={() =>
+                      form.trigger().then((ok) => ok && setDialogOpen(true))
+                    }
+                  >
+                    Save &amp; Submit
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-center">
+                      Submit your statement?
+                    </AlertDialogTitle>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className="flex justify-center gap-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => setDialogOpen(false)}
+                    >
+                      No
+                    </Button>
+                    <Button onClick={form.handleSubmit(submit)}>Yes</Button>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </form>
         </Form>
       </div>
 
+      {/* loader spinner */}
       <style jsx global>{`
         .loader {
           width: 50px;
           aspect-ratio: 1;
           border-radius: 50%;
-          border: 8px solid #0000;
+          border: 8px solid transparent;
           border-right-color: #ffa50097;
-          position: relative;
-          animation: l24 1s infinite linear;
+          animation: spin 1s linear infinite;
         }
-        .loader:before,
-        .loader:after {
-          content: "";
-          position: absolute;
-          inset: -8px;
-          border-radius: 50%;
-          border: inherit;
-          animation: inherit;
-          animation-duration: 2s;
-        }
-        .loader:after {
-          animation-duration: 4s;
-        }
-        @keyframes l24 {
-          100% {
-            transform: rotate(1turn);
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
           }
         }
       `}</style>
