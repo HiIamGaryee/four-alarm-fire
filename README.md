@@ -76,17 +76,11 @@ npm install
 yarn install
 ```
 
-3. Install backend dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-4. Set up environment variables:
+3. Set up environment variables:
 
 ```bash
 cp .env.example .env
-# Edit .env with your configuration
+# OPENAI_API_KEY=xxxx(open_ai_key)
 ```
 
 ### Running the Application
