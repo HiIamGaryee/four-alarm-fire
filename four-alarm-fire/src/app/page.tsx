@@ -23,6 +23,7 @@ import {
   FileUploadItemDelete,
 } from "@/components/ui/file-upload";
 import { Upload, X } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 type FormValues = {
   userName: string;
@@ -59,9 +60,7 @@ export default function InputStatement() {
     },
   });
 
-  const [files, setFiles] = React.useState<Record<string, File[]>>(
-    Object.fromEntries(uploadSections.map(({ key }) => [key, []]))
-  );
+  const [files, setFiles] = React.useState<File[]>([]);
 
   const handleFiles =
     (key: string) => (e: React.ChangeEvent<HTMLInputElement> | File[]) => {
