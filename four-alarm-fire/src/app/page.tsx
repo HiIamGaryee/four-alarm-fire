@@ -91,14 +91,13 @@ export default function InputStatement() {
       <div className="h-full w-full px-5 pt-5">
         <SidebarTrigger />
         <h1 className="mt-5 text-3xl font-semibold">Input Statement</h1>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <Card className="mt-5 flex flex-col p-6">
+              <Label className="mb-2 text-lg font-semibold">
+                Customer&apos;s Information
+              </Label>
 
-        <Card className="mt-5 flex flex-col p-6">
-          <Label className="mb-2 text-lg font-semibold">
-            Customer&apos;s Information
-          </Label>
-
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="userName"
@@ -155,66 +154,77 @@ export default function InputStatement() {
                   </FormItem>
                 )}
               />
+            </Card>
 
+            <div className="my-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {uploadSections.map(({ key, label }) => (
+                <Card key={key} className="pt-3">
+                  <Label className="ml-5 mb-2 text-lg font-semibold">
+                    {label}
+                  </Label>
+                  <FileUpload
+                    value={files[key]}
+                    onValueChange={(f) => handleFiles(key)(f)}
+                    maxFiles={2}
+                    maxSize={5 * 1024 * 1024}
+                    multiple
+                    className="mx-auto my-3 w-2/3"
+                  >
+                    <FileUploadDropzone>
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="rounded-full border p-2.5">
+                          <Upload className="size-6 text-muted-foreground" />
+                        </div>
+                        <p className="text-sm font-medium">
+                          Drag &amp; drop files here
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Or click to
+                          browse&nbsp;(max&nbsp;2,&nbsp;up&nbsp;to&nbsp;5&nbsp;MB)
+                        </p>
+                      </div>
+                      <FileUploadTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="mt-2 w-fit"
+                        >
+                          Browse files
+                        </Button>
+                      </FileUploadTrigger>
+                    </FileUploadDropzone>
+
+                    <FileUploadList>
+                      {files[key].map((file, i) => (
+                        <FileUploadItem key={i} value={file}>
+                          <FileUploadItemPreview />
+                          <FileUploadItemMetadata />
+                          <FileUploadItemDelete asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-7"
+                            >
+                              <X />
+                            </Button>
+                          </FileUploadItemDelete>
+                        </FileUploadItem>
+                      ))}
+                    </FileUploadList>
+                  </FileUpload>
+                </Card>
+              ))}
+            </div>
+            <div className="justify-end flex">
               <Button
                 type="submit"
-                className="w-full bg-black text-white hover:bg-black/80"
+                className="bg-black text-white hover:bg-black/80"
               >
-                Sign Up
+                Save & Submit
               </Button>
-            </form>
-          </Form>
-        </Card>
-
-        <div className="my-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {uploadSections.map(({ key, label }) => (
-            <Card key={key} className="pt-3">
-              <Label className="ml-5 mb-2 text-lg font-semibold">{label}</Label>
-              <FileUpload
-                value={files[key]}
-                onValueChange={(f) => handleFiles(key)(f)}
-                maxFiles={2}
-                maxSize={5 * 1024 * 1024}
-                multiple
-                className="mx-auto my-3 w-2/3"
-              >
-                <FileUploadDropzone>
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="rounded-full border p-2.5">
-                      <Upload className="size-6 text-muted-foreground" />
-                    </div>
-                    <p className="text-sm font-medium">
-                      Drag &amp; drop files here
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Or click to
-                      browse&nbsp;(max&nbsp;2,&nbsp;up&nbsp;to&nbsp;5&nbsp;MB)
-                    </p>
-                  </div>
-                  <FileUploadTrigger asChild>
-                    <Button variant="outline" size="sm" className="mt-2 w-fit">
-                      Browse files
-                    </Button>
-                  </FileUploadTrigger>
-                </FileUploadDropzone>
-
-                <FileUploadList>
-                  {files[key].map((file, i) => (
-                    <FileUploadItem key={i} value={file}>
-                      <FileUploadItemPreview />
-                      <FileUploadItemMetadata />
-                      <FileUploadItemDelete asChild>
-                        <Button variant="ghost" size="icon" className="size-7">
-                          <X />
-                        </Button>
-                      </FileUploadItemDelete>
-                    </FileUploadItem>
-                  ))}
-                </FileUploadList>
-              </FileUpload>
-            </Card>
-          ))}
-        </div>
+            </div>
+          </form>
+        </Form>
       </div>
 
       <style jsx global>{`
