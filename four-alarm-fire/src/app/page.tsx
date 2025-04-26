@@ -43,7 +43,7 @@ export default function Home() {
   return (
     <div className="h-full w-full px-5 pt-5">
       <SidebarTrigger />
-      <h1 className="text-3xl font-semibold mt-5">Dashboard</h1>
+      <h1 className="text-3xl font-semibold mt-5">Input Statement</h1>
       <Card className="mt-5 flex flex-col justify-center p-6">
         <Label className="font-semibold text-lg mb-2">
           Customer&apos;s Information

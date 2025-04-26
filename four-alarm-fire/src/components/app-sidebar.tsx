@@ -1,4 +1,4 @@
-import { NotebookText, Home } from "lucide-react";
+import { NotebookText, ChartColumnIncreasing } from "lucide-react";
 
 import {
   Sidebar,
@@ -14,14 +14,14 @@ import {
 // Menu items.
 const items = [
   {
-    title: "Dashboard",
-    url: "#",
-    icon: Home,
+    title: "Statement",
+    url: "/",
+    icon: NotebookText,
   },
   {
-    title: "Statement",
-    url: "#",
-    icon: NotebookText,
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: ChartColumnIncreasing,
   },
 ];
 
